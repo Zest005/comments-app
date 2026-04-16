@@ -6,7 +6,7 @@ namespace CommentsApp.Application.Common.Interfaces
 {
     public interface ICaptchaService
     {
-        (string CaptchaId, byte[] CaptchaImage) GenerateCaptcha();
+        (string CaptchaId, byte[] ImageBytes) GenerateCaptcha();
 
         bool ValidateCaptcha(string captchaId, string userInput);
     }
