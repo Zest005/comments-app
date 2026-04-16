@@ -1,0 +1,6 @@
+@CommentsApp.Web_HostAddress = http://localhost:5252
+
+GET {{CommentsApp.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
