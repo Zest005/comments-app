@@ -36,7 +36,13 @@ export class CommentItemComponent {
   }
 
   formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
+    let utcDateStr = dateStr;
+    if (!utcDateStr.endsWith('Z')) {
+      utcDateStr += 'Z';
+    }
+
+    const date = new Date(utcDateStr);
+    
     return date.toLocaleDateString('en-US', {
       day: '2-digit',
       month: '2-digit',
