@@ -1,6 +1,7 @@
-using CommentsApp.Persistence;
 using CommentsApp.Application;
 using CommentsApp.Infrastructure;
+using CommentsApp.Persistence;
+using CommentsApp.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,19 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddSignalR();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:5252", "https://localhost:7202")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,9 +40,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAngular");
+
 app.UseStaticFiles();
 
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapHub<CommentHub>("/hubs/comments");
 
 app.Run();

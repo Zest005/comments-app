@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.6">
       <PrivateAssets>all</PrivateAssets>
@@ -18,11 +19,6 @@
     <ProjectReference Include="..\CommentsApp.Application\CommentsApp.Application.csproj" />
     <ProjectReference Include="..\CommentsApp.Infrastructure\CommentsApp.Infrastructure.csproj" />
     <ProjectReference Include="..\CommentsApp.Persistence\CommentsApp.Persistence.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Hubs\" />
   </ItemGroup>
 
 </Project>
