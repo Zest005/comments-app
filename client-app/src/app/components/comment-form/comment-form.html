@@ -1,0 +1,110 @@
+<div class="comment-form" [class.reply-form]="parentCommentId !== null">
+  <h3 *ngIf="parentCommentId === null">Leave a Comment</h3>
+  <h4 *ngIf="parentCommentId !== null">Reply</h4>
+
+  <div class="error-message" *ngIf="errors['general']">
+    {{ errors['general'][0] }}
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>User Name *</label>
+      <input
+        type="text"
+        [(ngModel)]="userName"
+        placeholder="Latin letters and digits only"
+        [class.invalid]="errors['userName']"
+      />
+      <span class="error" *ngIf="errors['userName']">{{ errors['userName'][0] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>E-mail *</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        placeholder="user@example.com"
+        [class.invalid]="errors['email']"
+      />
+      <span class="error" *ngIf="errors['email']">{{ errors['email'][0] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>Home page</label>
+      <input
+        type="url"
+        [(ngModel)]="homePage"
+        placeholder="https://example.com"
+        [class.invalid]="errors['homePage']"
+      />
+      <span class="error" *ngIf="errors['homePage']">{{ errors['homePage'][0] }}</span>
+    </div>
+  </div>
+
+  <div class="tag-buttons">
+    <button type="button" (click)="insertTag('i')" title="Italic">[i]</button>
+    <button type="button" (click)="insertTag('strong')" title="Bold">[strong]</button>
+    <button type="button" (click)="insertTag('code')" title="Code">[code]</button>
+    <button type="button" (click)="insertTag('a')" title="Link">[a]</button>
+  </div>
+
+  <div class="form-group">
+    <label>Text *</label>
+    <textarea
+      [id]="parentCommentId ? 'reply-text-' + parentCommentId : 'comment-text'"
+      [(ngModel)]="text"
+      rows="5"
+      placeholder="Allowed HTML tags: &lt;a&gt;, &lt;code&gt;, &lt;i&gt;, &lt;strong&gt;"
+      [class.invalid]="errors['text']"
+    ></textarea>
+    <span class="error" *ngIf="errors['text']">{{ errors['text'][0] }}</span>
+  </div>
+
+  <div class="preview-section">
+    <button type="button" class="btn-preview" (click)="togglePreview()">
+      {{ showPreview ? 'Hide Preview' : 'Preview' }}
+    </button>
+    <div class="preview-box" *ngIf="showPreview" [innerHTML]="previewHtml"></div>
+  </div>
+
+  <div class="form-group">
+    <label>Attach file (JPG, PNG, GIF, TXT)</label>
+    <input type="file" (change)="onFileSelected($event)" accept=".jpg,.jpeg,.png,.gif,.txt" />
+  </div>
+
+  <div class="captcha-section">
+    <div class="captcha-image">
+      <img *ngIf="captchaImage" [src]="captchaImage" alt="CAPTCHA" />
+      <button type="button" class="btn-refresh" (click)="loadCaptcha()" title="New CAPTCHA">↻</button>
+    </div>
+    <div class="form-group">
+      <label>CAPTCHA *</label>
+      <input
+        type="text"
+        [(ngModel)]="captchaText"
+        placeholder="Enter text from image"
+        [class.invalid]="errors['captchaText']"
+      />
+      <span class="error" *ngIf="errors['captchaText']">{{ errors['captchaText'][0] }}</span>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button
+      type="button"
+      class="btn-submit"
+      (click)="onSubmit()"
+      [disabled]="isSubmitting"
+    >
+      {{ isSubmitting ? 'Sending...' : 'Send' }}
+    </button>
+    <button
+      *ngIf="parentCommentId !== null"
+      type="button"
+      class="btn-cancel"
+      (click)="cancelReply.emit()"
+    >
+      Cancel
+    </button>
+  </div>
+</div>

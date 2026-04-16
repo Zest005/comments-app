@@ -1,0 +1,53 @@
+<div class="comment-item">
+  <div class="comment-header">
+    <span class="username">{{ comment.userName }}</span>
+    <span class="email">{{ comment.email }}</span>
+    <span class="date">{{ formatDate(comment.createdAt) }}</span>
+    <a *ngIf="comment.homePage" [href]="comment.homePage" target="_blank" class="homepage">🌐</a>
+  </div>
+
+  <div class="comment-text" [innerHTML]="comment.text"></div>
+
+  <div class="comment-attachment" *ngIf="comment.attachment">
+    <div *ngIf="isImage(comment.attachment.contentType)" class="image-preview">
+      <img
+        [src]="comment.attachment.url"
+        [alt]="comment.attachment.fileName"
+        (click)="openLightbox(comment.attachment.url)"
+        class="thumbnail"
+      />
+    </div>
+    <div *ngIf="!isImage(comment.attachment.contentType)" class="file-link">
+      <a [href]="comment.attachment.url" target="_blank">
+        📄 {{ comment.attachment.fileName }}
+      </a>
+    </div>
+  </div>
+
+  <div class="comment-actions">
+    <button class="btn-reply" (click)="toggleReplyForm()">
+      {{ showReplyForm ? 'Cancel' : 'Reply' }}
+    </button>
+  </div>
+
+  <app-comment-form
+    *ngIf="showReplyForm"
+    [parentCommentId]="comment.id"
+    (cancelReply)="showReplyForm = false"
+    (commentCreated)="onReplyCreated()"
+  ></app-comment-form>
+
+  <div class="replies" *ngIf="comment.replies && comment.replies.length > 0">
+    <app-comment-item
+      *ngFor="let reply of comment.replies"
+      [comment]="reply"
+    ></app-comment-item>
+  </div>
+
+  <div class="lightbox-overlay" *ngIf="showLightbox" (click)="closeLightbox()">
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      <img [src]="lightboxUrl" alt="Full size image" />
+      <button class="lightbox-close" (click)="closeLightbox()">✕</button>
+    </div>
+  </div>
+</div>

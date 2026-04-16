@@ -1,0 +1,61 @@
+<div class="comments-container">
+  <h1>Comments</h1>
+
+  <app-comment-form (commentCreated)="onCommentCreated()"></app-comment-form>
+
+  <div class="sort-header">
+    <span>Total comments: {{ totalCount }}</span>
+    <div class="sort-buttons">
+      Sort by:
+      <button
+        [class.active]="sortBy === 'userName'"
+        (click)="onSort('userName')"
+      >
+        User Name {{ getSortIcon('userName') }}
+      </button>
+      <button
+        [class.active]="sortBy === 'email'"
+        (click)="onSort('email')"
+      >
+        E-mail {{ getSortIcon('email') }}
+      </button>
+      <button
+        [class.active]="sortBy === 'createdAt'"
+        (click)="onSort('createdAt')"
+      >
+        Date {{ getSortIcon('createdAt') }}
+      </button>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">Loading...</div>
+
+  <div class="comments-list" *ngIf="!isLoading">
+    <div *ngIf="comments.length === 0" class="no-comments">
+      No comments yet. Be the first!
+    </div>
+
+    <app-comment-item
+      *ngFor="let comment of comments"
+      [comment]="comment"
+    ></app-comment-item>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+      ← Previous
+    </button>
+
+    <button
+      *ngFor="let p of getPageNumbers()"
+      [class.active]="p === currentPage"
+      (click)="goToPage(p)"
+    >
+      {{ p }}
+    </button>
+
+    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+      Next →
+    </button>
+  </div>
+</div>
