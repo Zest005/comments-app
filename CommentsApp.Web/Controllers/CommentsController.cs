@@ -78,7 +78,17 @@ namespace CommentsApp.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { Error = ex.Message });
+                var fieldName = ex.Message.Contains("CAPTCHA", StringComparison.OrdinalIgnoreCase)
+                    ? "captchaText"
+                    : "general";
+
+                return BadRequest(new
+                {
+                    Errors = new Dictionary<string, string[]>
+                    {
+                        { fieldName, new[] { ex.Message } }
+                    }
+                });
             }
         }
     }

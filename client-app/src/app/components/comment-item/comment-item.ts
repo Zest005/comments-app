@@ -12,6 +12,7 @@ import { CommentFormComponent } from '../comment-form/comment-form';
 })
 export class CommentItemComponent {
   @Input() comment!: Comment;
+  @Input() isReply = false;
 
   showReplyForm = false;
   showLightbox = false;

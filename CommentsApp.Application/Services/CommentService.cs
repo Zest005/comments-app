@@ -43,6 +43,17 @@ namespace CommentsApp.Application.Services
             if (!isCaptchaValid)
                 throw new InvalidOperationException("Invalid CAPTCHA");
 
+            if (dto.ParentCommentId.HasValue)
+            {
+                var parentComment = await _commentRepository.GetByIdAsync(dto.ParentCommentId.Value);
+
+                if (parentComment == null)
+                    throw new InvalidOperationException("Parent comment not found.");
+
+                if (parentComment.ParentCommentId != null)
+                    throw new InvalidOperationException("You can only reply to root comments.");
+            }
+
             var sanitizedText = SanitizeHtml(dto.Text);
 
             var comment = new Comment
@@ -93,7 +104,7 @@ namespace CommentsApp.Application.Services
                     FileName = comment.Attachment.FileName,
                     ContentType = comment.Attachment.ContentType,
                     FileSize = comment.Attachment.FileSize,
-                    Url = $"/api/attachments/{comment.Attachment.Id}"
+                    Url = $"/api/attachments/{comment.Id}"
                 }
                 : null,
                 Replies = comment.Replies
@@ -108,11 +119,8 @@ namespace CommentsApp.Application.Services
             if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
 
-            // Список разрешённых тегов
             var allowedTags = new HashSet<string> { "a", "code", "i", "strong" };
 
-            // Заменяем запрещённые теги — убираем < и > чтобы браузер
-            // не интерпретировал их как HTML
             var result = System.Text.RegularExpressions.Regex.Replace(
                 input,
                 @"<(/?)(\w+)([^>]*)>",
@@ -122,13 +130,11 @@ namespace CommentsApp.Application.Services
 
                     if (!allowedTags.Contains(tagName))
                     {
-                        // Запрещённый тег — экранируем
                         return match.Value
                             .Replace("<", "&lt;")
                             .Replace(">", "&gt;");
                     }
 
-                    // Для тега <a> оставляем только href и title
                     if (tagName == "a" && !match.Groups[1].Value.Contains("/"))
                     {
                         var attributes = match.Groups[3].Value;
@@ -152,13 +158,17 @@ namespace CommentsApp.Application.Services
                                 : title.Groups[2].Value;
                             cleanTag += $@" title=""{titleValue}""";
                         }
+
+                        cleanTag += @" target=""_blank"" rel=""noopener noreferrer""";
                         cleanTag += ">";
+
                         return cleanTag;
                     }
 
-                    // Разрешённый тег — оставляем как есть
                     return match.Value;
                 });
+
+            result = result.Replace("\r\n", "<br>").Replace("\n", "<br>");
 
             return result;
         }

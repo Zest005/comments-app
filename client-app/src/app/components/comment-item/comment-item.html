@@ -24,14 +24,14 @@
     </div>
   </div>
 
-  <div class="comment-actions">
+  <div class="comment-actions" *ngIf="!isReply">
     <button class="btn-reply" (click)="toggleReplyForm()">
       {{ showReplyForm ? 'Cancel' : 'Reply' }}
     </button>
   </div>
 
   <app-comment-form
-    *ngIf="showReplyForm"
+    *ngIf="showReplyForm && !isReply"
     [parentCommentId]="comment.id"
     (cancelReply)="showReplyForm = false"
     (commentCreated)="onReplyCreated()"
@@ -41,6 +41,7 @@
     <app-comment-item
       *ngFor="let reply of comment.replies"
       [comment]="reply"
+      [isReply]="true"
     ></app-comment-item>
   </div>
 

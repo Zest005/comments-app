@@ -165,10 +165,16 @@ export class CommentFormComponent implements OnInit {
       },
       error: (err) => {
         this.isSubmitting = false;
-        if (err.error?.Errors) {
-          this.errors = err.error.Errors;
-        } else if (err.error?.Error) {
-          this.errors = { general: [err.error.Error] };
+        const serverErrors = err.error?.Errors || err.error?.errors;
+        if (serverErrors) {
+          const errors: { [key: string]: string[] } = {};
+          for (const key of Object.keys(serverErrors)) {
+            const normalizedKey = key.charAt(0).toLowerCase() + key.slice(1);
+            errors[normalizedKey] = serverErrors[key];
+          }
+          this.errors = errors;
+        } else if (err.error?.Error || err.error?.error) {
+          this.errors = { general: [err.error.Error || err.error.error] };
         } else {
           this.errors = { general: ['An error occurred. Please try again.'] };
         }

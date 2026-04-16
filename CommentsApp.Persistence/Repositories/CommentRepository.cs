@@ -41,9 +41,6 @@ namespace CommentsApp.Persistence.Repositories
                 .Include(c => c.Attachment)
                 .Include(c => c.Replies)
                     .ThenInclude(r => r.Attachment)
-                .Include(c => c.Replies)
-                    .ThenInclude(r => r.Replies)
-                        .ThenInclude(r => r.Attachment)
                 .AsSplitQuery()
                 .ToListAsync();
 

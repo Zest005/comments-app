@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Subject } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
 import { Comment } from '../models/comment.model';
@@ -8,8 +8,9 @@ import { Comment } from '../models/comment.model';
 })
 export class SignalRService {
   private hubConnection!: signalR.HubConnection;
-
   public newComment$ = new Subject<Comment>();
+
+  constructor(private ngZone: NgZone) {}
 
   startConnection(): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -23,7 +24,9 @@ export class SignalRService {
       .catch(err => console.error('SignalR connection error:', err));
 
     this.hubConnection.on('NewComment', (comment: Comment) => {
-      this.newComment$.next(comment);
+      this.ngZone.run(() => {
+        this.newComment$.next(comment);
+      });
     });
   }
 
