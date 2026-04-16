@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CommentsApp.Application.DTOs
+{
+    public class CreateCommentDto
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? HomePage { get; set; }
+        public string Text { get; set; } = string.Empty;
+        public int? ParentCommentId { get; set; }
+        public string CaptchaText { get; set; } = string.Empty;
+        public string CaptchaId { get; set; } = string.Empty;
+    }
+}
