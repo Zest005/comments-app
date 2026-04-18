@@ -76,7 +76,7 @@
     <input type="file" (change)="onFileSelected($event)" accept=".jpg,.jpeg,.png,.gif,.txt" autocomplete="off" />
   </div>
 
-  <div class="captcha-section">
+  <div class="captcha-section" *ngIf="selectedFile">
     <div class="captcha-image">
       <img *ngIf="captchaImage" [src]="captchaImage" alt="CAPTCHA" />
       <button type="button" class="btn-refresh" (click)="loadCaptcha()" title="New CAPTCHA">↻</button>

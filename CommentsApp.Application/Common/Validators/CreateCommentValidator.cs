@@ -26,12 +26,6 @@ namespace CommentsApp.Application.Common.Validators
 
             RuleFor(x => x.Text)
                 .NotEmpty().WithMessage("Comment text is required.");
-
-            RuleFor(x => x.CaptchaText)
-                .NotEmpty().WithMessage("CAPTCHA is required.");
-
-            RuleFor(x => x.CaptchaId)
-                .NotEmpty().WithMessage("CAPTCHA ID is required.");
         }
     }
 }

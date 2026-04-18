@@ -39,9 +39,19 @@ namespace CommentsApp.Application.Services
             string? fileName = null,
             string? fileContentType = null)
         {
-            var isCaptchaValid = _captchaService.ValidateCaptcha(dto.CaptchaId, dto.CaptchaText);
-            if (!isCaptchaValid)
-                throw new InvalidOperationException("Invalid CAPTCHA");
+            if (fileData != null && fileName != null)
+            {
+                if (string.IsNullOrWhiteSpace(dto.CaptchaId) || string.IsNullOrWhiteSpace(dto.CaptchaText))
+                {
+                    throw new InvalidOperationException("CAPTCHA is required when uploading a file.");
+                }
+
+                var isCaptchaValid = _captchaService.ValidateCaptcha(dto.CaptchaId, dto.CaptchaText);
+                if (!isCaptchaValid)
+                {
+                    throw new InvalidOperationException("Invalid CAPTCHA.");
+                }
+            }
 
             var sanitizedText = SanitizeHtml(dto.Text);
 

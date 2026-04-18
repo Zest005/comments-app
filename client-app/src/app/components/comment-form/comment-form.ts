@@ -34,7 +34,7 @@ export class CommentFormComponent implements OnInit {
   constructor(private commentService: CommentService) {}
 
   ngOnInit(): void {
-    this.loadCaptcha();
+
   }
 
   loadCaptcha(): void {
@@ -67,6 +67,12 @@ export class CommentFormComponent implements OnInit {
       }
 
       this.selectedFile = file;
+      this.loadCaptcha();
+    } else {
+      this.selectedFile = null;
+      this.captchaText = '';
+      this.captchaId = '';
+      this.captchaImage = '';
     }
   }
 
@@ -130,8 +136,8 @@ export class CommentFormComponent implements OnInit {
       this.errors['text'] = ['Comment text is required.'];
     }
 
-    if (!this.captchaText.trim()) {
-      this.errors['captchaText'] = ['CAPTCHA is required.'];
+    if (this.selectedFile && !this.captchaText.trim()) {
+      this.errors['captchaText'] = ['CAPTCHA is required when uploading a file.'];
     }
 
     return Object.keys(this.errors).length === 0;
@@ -157,10 +163,11 @@ export class CommentFormComponent implements OnInit {
       next: () => {
         this.text = '';
         this.captchaText = '';
+        this.captchaId = '';
+        this.captchaImage = '';
         this.selectedFile = null;
         this.showPreview = false;
         this.errors = {};
-        this.loadCaptcha();
         this.commentCreated.emit();
       },
       error: (err) => {
