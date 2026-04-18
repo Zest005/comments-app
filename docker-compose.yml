@@ -1,0 +1,30 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: comments-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=StrongPassword123!
+    ports:
+      - "1434:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: comments-app
+    ports:
+      - "8080:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=CommentsAppDb;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True;MultipleActiveResultSets=True
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      - mssql
+    volumes:
+      - uploads-data:/app/uploads
+
+volumes:
+  mssql-data:
+  uploads-data:

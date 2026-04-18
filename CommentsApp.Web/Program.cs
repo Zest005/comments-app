@@ -2,6 +2,7 @@ using CommentsApp.Application;
 using CommentsApp.Infrastructure;
 using CommentsApp.Persistence;
 using CommentsApp.Web.Hubs;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -48,5 +55,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<CommentHub>("/hubs/comments");
+
+// SPA fallback — Angular маршруты
+app.MapFallbackToFile("index.html");
 
 app.Run();
