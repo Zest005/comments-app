@@ -50,12 +50,8 @@ export class CommentListComponent implements OnInit, OnDestroy {
           this.loadComments();
         }
       } else {
-        const parent = this.comments.find(c => c.id === newComment.parentCommentId);
-        if (parent) {
-          if (!parent.replies) {
-            parent.replies = [];
-          }
-          parent.replies.push(newComment);
+        if (!this.addReplyToTree(this.comments, newComment)) {
+          this.loadComments();
         }
       }
     });

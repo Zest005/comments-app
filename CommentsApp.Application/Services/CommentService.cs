@@ -43,17 +43,6 @@ namespace CommentsApp.Application.Services
             if (!isCaptchaValid)
                 throw new InvalidOperationException("Invalid CAPTCHA");
 
-            if (dto.ParentCommentId.HasValue)
-            {
-                var parentComment = await _commentRepository.GetByIdAsync(dto.ParentCommentId.Value);
-
-                if (parentComment == null)
-                    throw new InvalidOperationException("Parent comment not found.");
-
-                if (parentComment.ParentCommentId != null)
-                    throw new InvalidOperationException("You can only reply to root comments.");
-            }
-
             var sanitizedText = SanitizeHtml(dto.Text);
 
             var comment = new Comment

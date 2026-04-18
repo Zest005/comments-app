@@ -39,10 +39,17 @@ namespace CommentsApp.Persistence.Repositories
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(c => c.Attachment)
-                .Include(c => c.Replies)
-                    .ThenInclude(r => r.Attachment)
                 .AsSplitQuery()
                 .ToListAsync();
+
+            if (comments.Count > 0)
+            {
+                await _context.Comments
+                    .Where(c => c.ParentCommentId != null)
+                    .Include(c => c.Attachment)
+                    .AsSplitQuery()
+                    .LoadAsync();
+            }
 
             return (comments, totalCount);
         }
