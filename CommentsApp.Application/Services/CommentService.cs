@@ -53,6 +53,10 @@ namespace CommentsApp.Application.Services
                 }
             }
 
+            var tagError = ValidateHtmlTags(dto.Text);
+            if (tagError != null)
+                throw new InvalidOperationException(tagError);
+
             var sanitizedText = SanitizeHtml(dto.Text);
 
             var comment = new Comment
@@ -84,6 +88,41 @@ namespace CommentsApp.Application.Services
             var savedComment = await _commentRepository.AddAsync(comment);
 
             return MapToDto(savedComment);
+        }
+
+        private string? ValidateHtmlTags(string input)
+        {
+            var allowedTags = new HashSet<string> { "a", "code", "i", "strong" };
+            var tagStack = new Stack<string>();
+
+            var tagMatches = System.Text.RegularExpressions.Regex.Matches(input, @"<(/?)(\w+)([^>]*)>");
+
+            foreach (System.Text.RegularExpressions.Match match in tagMatches)
+            {
+                var isClosing = match.Groups[1].Value == "/";
+                var tagName = match.Groups[2].Value.ToLower();
+
+                if (!allowedTags.Contains(tagName))
+                    continue;
+
+                if (isClosing)
+                {
+                    if (tagStack.Count == 0 || tagStack.Peek() != tagName)
+                        return $"Unexpected closing tag </{tagName}>. Tags must be properly nested.";
+
+                    tagStack.Pop();
+                }
+                else
+                    tagStack.Push(tagName);
+            }
+            if (tagStack.Count > 0)
+            {
+                var unclosedTag = string.Join(", ", tagStack.Select(t => $"<{t}>"));
+
+                return $"Unclosed tags detected: {unclosedTag}. All tags must be properly closed.";
+            }
+
+            return null;
         }
 
         private CommentDto MapToDto(Comment comment)
