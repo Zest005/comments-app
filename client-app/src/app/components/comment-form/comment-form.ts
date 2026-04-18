@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentService } from '../../services/comment.service';
 import { I18nService } from '../../services/i18n.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-comment-form',
@@ -32,10 +33,15 @@ export class CommentFormComponent implements OnInit {
   previewHtml = '';
   showPreview = false;
 
-  constructor(private commentService: CommentService, public i18n: I18nService) {}
+  constructor(private commentService: CommentService, public i18n: I18nService, public auth: AuthService) {}
 
   ngOnInit(): void {
-
+    const user = this.auth.getUser();
+    if (user) {
+      this.userName = user.userName;
+      this.email = user.email;
+      this.homePage = user.homePage || '';
+    }
   }
 
   loadCaptcha(): void {

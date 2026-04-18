@@ -7,5 +7,53 @@
       <button [class.active]="i18n.lang === 'en'" (click)="setLang('en')">EN</button>
       <button [class.active]="i18n.lang === 'uk'" (click)="setLang('uk')">UA</button>
     </div>
+
+    <div class="user-section" *ngIf="user">
+      <span class="user-greeting">{{ i18n.t('welcomeBack') }}, <strong>{{ user.userName }}</strong></span>
+      <button class="btn-header-action" (click)="openLoginForm()">{{ i18n.t('changeUser') }}</button>
+      <button class="btn-header-action btn-logout" (click)="onLogout()">{{ i18n.t('logout') }}</button>
+    </div>
+
+    <div class="user-section" *ngIf="!user">
+      <button class="btn-login" (click)="openLoginForm()">{{ i18n.t('login') }}</button>
+    </div>
   </div>
 </header>
+
+<div class="login-overlay" *ngIf="showLoginForm" [class.closing]="closingLoginForm">
+  <div class="login-form" [class.closing]="closingLoginForm">
+    <h3>{{ i18n.t('loginTitle') }}</h3>
+
+    <div class="form-group">
+      <label>{{ i18n.t('userName') }} *</label>
+      <input type="text" [(ngModel)]="loginUserName"
+        [placeholder]="i18n.t('userNamePlaceholder')"
+        [class.invalid]="loginErrors['userName']"
+        autocomplete="off" />
+      <span class="error" *ngIf="loginErrors['userName']">{{ loginErrors['userName'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>{{ i18n.t('email') }} *</label>
+      <input type="email" [(ngModel)]="loginEmail"
+        [placeholder]="i18n.t('emailPlaceholder')"
+        [class.invalid]="loginErrors['email']"
+        autocomplete="off" />
+      <span class="error" *ngIf="loginErrors['email']">{{ loginErrors['email'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>{{ i18n.t('homePage') }}</label>
+      <input type="url" [(ngModel)]="loginHomePage"
+        [placeholder]="i18n.t('homePagePlaceholder')"
+        [class.invalid]="loginErrors['homePage']"
+        autocomplete="off" />
+      <span class="error" *ngIf="loginErrors['homePage']">{{ loginErrors['homePage'] }}</span>
+    </div>
+
+    <div class="login-actions">
+      <button class="btn-submit" (click)="onLogin()">{{ i18n.t('login') }}</button>
+      <button class="btn-cancel" (click)="closeLoginForm()">{{ i18n.t('cancel') }}</button>
+    </div>
+  </div>
+</div>
