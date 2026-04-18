@@ -76,6 +76,14 @@ export class CommentFormComponent implements OnInit {
     }
   }
 
+  removeFile(fileInput: HTMLInputElement): void {
+    this.selectedFile = null;
+    this.captchaText = '';
+    this.captchaId = '';
+    this.captchaImage = '';
+    fileInput.value = '';
+  }
+
   insertTag(tag: string): void {
     const textarea = document.querySelector(
       this.parentCommentId ? `#reply-text-${this.parentCommentId}` : '#comment-text'

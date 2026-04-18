@@ -201,3 +201,42 @@ h3, h4 {
 .btn-cancel:hover {
   background: #d0d0d0;
 }
+
+.file-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-file-select {
+  padding: 6px 14px;
+  background: #e8e8e8;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-file-select:hover {
+  background: #d8d8d8;
+}
+
+.file-name {
+  font-size: 13px;
+  color: #666;
+}
+
+.btn-remove-file {
+  padding: 2px 8px;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  color: #e74c3c;
+  line-height: 1;
+}
+
+.btn-remove-file:hover {
+  background: #ffeaea;
+}

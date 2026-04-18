@@ -71,9 +71,17 @@
     <div class="preview-box" *ngIf="showPreview" [innerHTML]="previewHtml"></div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group file-upload-group">
     <label>Attach file (JPG, PNG, GIF, TXT)</label>
-    <input type="file" (change)="onFileSelected($event)" accept=".jpg,.jpeg,.png,.gif,.txt" autocomplete="off" />
+    <div class="file-upload-row">
+      <label class="btn-file-select">
+        Choose file
+        <input type="file" (change)="onFileSelected($event)" accept=".jpg,.jpeg,.png,.gif,.txt" #fileInput hidden/>
+      </label>
+      <span class="file-name" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+      <button type="button" class="btn-remove-file" *ngIf="selectedFile" (click)="removeFile(fileInput)" title="Remove file"> ✕ </button>
+      <span class="file-name" *ngIf="!selectedFile">No file selected</span>
+    </div>
   </div>
 
   <div class="captcha-section" *ngIf="selectedFile">
