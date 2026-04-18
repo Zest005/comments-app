@@ -114,6 +114,8 @@ export class CommentFormComponent implements OnInit {
 
     this.text = this.text.substring(0, start) + insertion + this.text.substring(end);
 
+    this.onTextChange();
+
     setTimeout(() => {
       textarea.focus();
       const newCursorPos = start + insertion.length;
