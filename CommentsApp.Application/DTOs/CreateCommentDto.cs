@@ -11,7 +11,7 @@ namespace CommentsApp.Application.DTOs
         public string? HomePage { get; set; }
         public string Text { get; set; } = string.Empty;
         public int? ParentCommentId { get; set; }
-        public string CaptchaText { get; set; } = string.Empty;
-        public string CaptchaId { get; set; } = string.Empty;
+        public string? CaptchaText { get; set; }
+        public string? CaptchaId { get; set; }
     }
 }

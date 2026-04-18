@@ -86,20 +86,10 @@ export class CommentListComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSort(field: string): void {
-    if (this.sortBy === field) {
-      this.sortDescending = !this.sortDescending;
-    } else {
-      this.sortBy = field;
-      this.sortDescending = true;
-    }
+  onSortDirection(descending: boolean): void {
+    this.sortDescending = descending;
     this.currentPage = 1;
     this.loadComments();
-  }
-
-  getSortIcon(field: string): string {
-    if (this.sortBy !== field) return '↕';
-    return this.sortDescending ? '↓' : '↑';
   }
 
   goToPage(page: number): void {
