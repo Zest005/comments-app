@@ -162,6 +162,12 @@ export class CommentFormComponent implements OnInit {
       this.previewHtml = this.sanitizePreview(this.text);
     }
   }
+  
+  onTextChange(): void {
+    if (this.showPreview) {
+      this.previewHtml = this.sanitizePreview(this.text);
+    }
+  }
 
   validate(): boolean {
     this.errors = {};

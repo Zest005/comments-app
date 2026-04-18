@@ -57,6 +57,7 @@
       [id]="parentCommentId ? 'reply-text-' + parentCommentId : 'comment-text'"
       [(ngModel)]="text"
       rows="5"
+      (ngModelChange)="onTextChange()"
       [placeholder]="i18n.t('textPlaceholder')"
       [class.invalid]="errors['text']"
       autocomplete="off"
