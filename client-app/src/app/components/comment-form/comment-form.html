@@ -14,6 +14,7 @@
         [(ngModel)]="userName"
         placeholder="Latin letters and digits only"
         [class.invalid]="errors['userName']"
+        autocomplete="off"
       />
       <span class="error" *ngIf="errors['userName']">{{ errors['userName'][0] }}</span>
     </div>
@@ -25,6 +26,7 @@
         [(ngModel)]="email"
         placeholder="user@example.com"
         [class.invalid]="errors['email']"
+        autocomplete="off"
       />
       <span class="error" *ngIf="errors['email']">{{ errors['email'][0] }}</span>
     </div>
@@ -36,6 +38,7 @@
         [(ngModel)]="homePage"
         placeholder="https://example.com"
         [class.invalid]="errors['homePage']"
+        autocomplete="off"
       />
       <span class="error" *ngIf="errors['homePage']">{{ errors['homePage'][0] }}</span>
     </div>
@@ -56,6 +59,7 @@
       rows="5"
       placeholder="Allowed HTML tags: &lt;a&gt;, &lt;code&gt;, &lt;i&gt;, &lt;strong&gt;"
       [class.invalid]="errors['text']"
+      autocomplete="off"
     ></textarea>
     <span class="error" *ngIf="errors['text']">{{ errors['text'][0] }}</span>
   </div>
@@ -69,7 +73,7 @@
 
   <div class="form-group">
     <label>Attach file (JPG, PNG, GIF, TXT)</label>
-    <input type="file" (change)="onFileSelected($event)" accept=".jpg,.jpeg,.png,.gif,.txt" />
+    <input type="file" (change)="onFileSelected($event)" accept=".jpg,.jpeg,.png,.gif,.txt" autocomplete="off" />
   </div>
 
   <div class="captcha-section">
@@ -84,6 +88,7 @@
         [(ngModel)]="captchaText"
         placeholder="Enter text from image"
         [class.invalid]="errors['captchaText']"
+        autocomplete="off"
       />
       <span class="error" *ngIf="errors['captchaText']">{{ errors['captchaText'][0] }}</span>
     </div>
