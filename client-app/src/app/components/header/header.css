@@ -1,0 +1,39 @@
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: #2c3e50;
+  color: white;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.header-left h2 { margin: 0; font-size: 20px; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.lang-switcher { display: flex; gap: 4px; }
+
+.lang-switcher button {
+  padding: 3px 8px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 3px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.lang-switcher button:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.lang-switcher button.active {
+  background: #4a90d9;
+  border-color: #4a90d9;
+}

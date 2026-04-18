@@ -3,7 +3,7 @@
     <span class="username">{{ comment.userName }}</span>
     <span class="email">{{ comment.email }}</span>
     <span class="date">{{ formatDate(comment.createdAt) }}</span>
-    <a *ngIf="comment.homePage" [href]="comment.homePage" target="_blank" class="homepage">🌐</a>
+    <a *ngIf="comment.homePage" [href]="comment.homePage" target="_blank" rel="noopener noreferrer" class="homepage">🌐</a>
   </div>
 
   <div class="comment-text" [innerHTML]="comment.text"></div>
@@ -18,7 +18,7 @@
       />
     </div>
     <div *ngIf="!isImage(comment.attachment.contentType)" class="file-link">
-      <a [href]="comment.attachment.url" target="_blank">
+      <a [href]="comment.attachment.url" target="_blank" rel="noopener noreferrer">
         📄 {{ comment.attachment.fileName }}
       </a>
     </div>
@@ -26,7 +26,7 @@
 
   <div class="comment-actions">
     <button class="btn-reply" (click)="toggleReplyForm()">
-      {{ showReplyForm ? 'Cancel' : 'Reply' }}
+      {{ showReplyForm ? i18n.t('cancel') : i18n.t('reply') }}
     </button>
   </div>
 
@@ -44,7 +44,7 @@
     ></app-comment-item>
   </div>
 
-  <div class="lightbox-overlay" *ngIf="showLightbox" (click)="closeLightbox()">
+  <div class="lightbox-overlay" *ngIf="showLightbox" [class.closing]="closingLightbox" (click)="closeLightbox()">
     <div class="lightbox-content" (click)="$event.stopPropagation()">
       <img [src]="lightboxUrl" alt="Full size image" />
       <button class="lightbox-close" (click)="closeLightbox()">✕</button>

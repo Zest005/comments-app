@@ -1,32 +1,30 @@
 <div class="comments-container">
-  <h1>Comments</h1>
-
   <app-comment-form (commentCreated)="onCommentCreated()"></app-comment-form>
 
   <div class="sort-header">
-    <span>Total comments: {{ totalCount }}</span>
+    <span>{{ i18n.t('totalComments') }}: {{ totalCount }}</span>
     <div class="sort-buttons">
-      Sort by date:
+      {{ i18n.t('sortByDate') }}:
       <button
         [class.active]="sortDescending"
         (click)="onSortDirection(true)"
       >
-        Newest first ↓
+        {{ i18n.t('newestFirst') }}
       </button>
       <button
         [class.active]="!sortDescending"
         (click)="onSortDirection(false)"
       >
-        Oldest first ↑
+        {{ i18n.t('oldestFirst') }}
       </button>
     </div>
   </div>
 
-  <div class="loading" *ngIf="isLoading">Loading...</div>
+  <div class="loading" *ngIf="isLoading">{{ i18n.t('loading') }}</div>
 
   <div class="comments-list" *ngIf="!isLoading">
     <div *ngIf="comments.length === 0" class="no-comments">
-      No comments yet. Be the first!
+      {{ i18n.t('noComments') }}
     </div>
 
     <app-comment-item
@@ -37,7 +35,7 @@
 
   <div class="pagination" *ngIf="totalPages > 1">
     <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
-      ← Previous
+      {{ i18n.t('previous') }}
     </button>
 
     <button
@@ -49,7 +47,7 @@
     </button>
 
     <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
-      Next →
+      {{ i18n.t('next') }}
     </button>
   </div>
 </div>

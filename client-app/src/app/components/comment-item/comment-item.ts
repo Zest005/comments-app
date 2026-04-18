@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Comment } from '../../models/comment.model';
 import { CommentFormComponent } from '../comment-form/comment-form';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-comment-item',
@@ -15,7 +16,10 @@ export class CommentItemComponent {
 
   showReplyForm = false;
   showLightbox = false;
+  closingLightbox = false;
   lightboxUrl = '';
+
+  constructor(public i18n: I18nService) {}
 
   toggleReplyForm(): void {
     this.showReplyForm = !this.showReplyForm;
@@ -28,28 +32,20 @@ export class CommentItemComponent {
   openLightbox(url: string): void {
     this.lightboxUrl = url;
     this.showLightbox = true;
+    this.closingLightbox = false;
   }
 
   closeLightbox(): void {
-    this.showLightbox = false;
-    this.lightboxUrl = '';
+    this.closingLightbox = true;
+    setTimeout(() => {
+      this.showLightbox = false;
+      this.closingLightbox = false;
+      this.lightboxUrl = '';
+    }, 300);
   }
 
   formatDate(dateStr: string): string {
-    let utcDateStr = dateStr;
-    if (!utcDateStr.endsWith('Z')) {
-      utcDateStr += 'Z';
-    }
-
-    const date = new Date(utcDateStr);
-    
-    return date.toLocaleDateString('en-US', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return this.i18n.formatDate(dateStr);
   }
 
   isImage(contentType: string): boolean {

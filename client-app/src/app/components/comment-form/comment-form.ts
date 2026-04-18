@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentService } from '../../services/comment.service';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-comment-form',
@@ -31,7 +32,7 @@ export class CommentFormComponent implements OnInit {
   previewHtml = '';
   showPreview = false;
 
-  constructor(private commentService: CommentService) {}
+  constructor(private commentService: CommentService, public i18n: I18nService) {}
 
   ngOnInit(): void {
 
@@ -61,7 +62,7 @@ export class CommentFormComponent implements OnInit {
       }
 
       if (file.type === 'text/plain' && file.size > 100 * 1024) {
-        alert('Text file must not exceed 100 KB.');
+        alert(this.i18n.t('fileSizeError'));
         input.value = '';
         return;
       }
@@ -98,9 +99,9 @@ export class CommentFormComponent implements OnInit {
     let insertion: string;
 
     if (tag === 'a') {
-      const url = prompt('Enter URL:', 'https://');
+      const url = prompt(this.i18n.t('enterUrl'), 'https://');
       if (!url) return;
-      insertion = `<a href="${url}" title="">${selectedText || 'link text'}</a>`;
+      insertion = `<a href="${url}" title="">${selectedText || this.i18n.t('linkText')}</a>`;
     } else {
       insertion = `<${tag}>${selectedText}</${tag}>`;
     }
@@ -114,10 +115,51 @@ export class CommentFormComponent implements OnInit {
     });
   }
 
+  private translateServerError(msg: string): string {
+    const errorMap: Record<string, string> = {
+      'Invalid CAPTCHA.': this.i18n.t('invalidCaptcha'),
+      'CAPTCHA is required when uploading a file.': this.i18n.t('captchaRequiredFile'),
+    };
+    if (msg.startsWith('Unclosed') || msg.startsWith('Unexpected')) {
+      return this.i18n.t('invalidHtmlTags');
+    }
+    return errorMap[msg] || msg;
+  }
+
+  private sanitizePreview(input: string): string {
+    if (!input) return '';
+
+    const allowedTags = new Set(['a', 'code', 'i', 'strong']);
+
+    let result = input.replace(/<(\/?)(\w+)([^>]*)>/g, (match, slash, tagName, attrs) => {
+      const tag = tagName.toLowerCase();
+
+      if (!allowedTags.has(tag)) {
+        return match.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      if (tag === 'a' && slash !== '/') {
+        const hrefMatch = attrs.match(/href\s*=\s*"([^"]*)"/);
+        const titleMatch = attrs.match(/title\s*=\s*"([^"]*)"/);
+        let cleanTag = '<a';
+        if (hrefMatch) cleanTag += ` href="${hrefMatch[1]}"`;
+        if (titleMatch) cleanTag += ` title="${titleMatch[1]}"`;
+        cleanTag += ' target="_blank" rel="noopener noreferrer">';
+        return cleanTag;
+      }
+
+      return match;
+    });
+
+    result = result.replace(/\n/g, '<br>');
+
+    return result;
+  }
+
   togglePreview(): void {
     this.showPreview = !this.showPreview;
     if (this.showPreview) {
-      this.previewHtml = this.text.replace(/\n/g, '<br>');
+      this.previewHtml = this.sanitizePreview(this.text);
     }
   }
 
@@ -125,27 +167,27 @@ export class CommentFormComponent implements OnInit {
     this.errors = {};
 
     if (!this.userName.trim()) {
-      this.errors['userName'] = ['User Name is required.'];
+      this.errors['userName'] = [this.i18n.t('userNameRequired')];
     } else if (!/^[a-zA-Z0-9]+$/.test(this.userName)) {
-      this.errors['userName'] = ['Only Latin letters and digits allowed.'];
+      this.errors['userName'] = [this.i18n.t('userNameInvalid')];
     }
 
     if (!this.email.trim()) {
-      this.errors['email'] = ['E-mail is required.'];
+      this.errors['email'] = [this.i18n.t('emailRequired')];
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
-      this.errors['email'] = ['Invalid email format.'];
+      this.errors['email'] = [this.i18n.t('emailInvalid')];
     }
 
     if (this.homePage.trim() && !/^https?:\/\/.+/.test(this.homePage)) {
-      this.errors['homePage'] = ['Must be a valid URL (starting with http:// or https://).'];
+      this.errors['homePage'] = [this.i18n.t('homePageInvalid')];
     }
 
     if (!this.text.trim()) {
-      this.errors['text'] = ['Comment text is required.'];
+      this.errors['text'] = [this.i18n.t('textRequired')];
     }
 
     if (this.selectedFile && !this.captchaText.trim()) {
-      this.errors['captchaText'] = ['CAPTCHA is required when uploading a file.'];
+      this.errors['captchaText'] = [this.i18n.t('captchaRequiredFile')];
     }
 
     return Object.keys(this.errors).length === 0;
@@ -185,13 +227,14 @@ export class CommentFormComponent implements OnInit {
           const errors: { [key: string]: string[] } = {};
           for (const key of Object.keys(serverErrors)) {
             const normalizedKey = key.charAt(0).toLowerCase() + key.slice(1);
-            errors[normalizedKey] = serverErrors[key];
+            errors[normalizedKey] = serverErrors[key].map((msg: string) => this.translateServerError(msg));
           }
           this.errors = errors;
         } else if (err.error?.Error || err.error?.error) {
-          this.errors = { general: [err.error.Error || err.error.error] };
+          const msg = err.error.Error || err.error.error;
+          this.errors = { general: [this.translateServerError(msg)] };
         } else {
-          this.errors = { general: ['An error occurred. Please try again.'] };
+          this.errors = { general: [this.i18n.t('generalError')] };
         }
         this.loadCaptcha();
       },

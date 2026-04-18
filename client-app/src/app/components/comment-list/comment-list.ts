@@ -6,6 +6,7 @@ import { CommentService } from '../../services/comment.service';
 import { SignalRService } from '../../services/signalr.service';
 import { CommentFormComponent } from '../comment-form/comment-form';
 import { CommentItemComponent } from '../comment-item/comment-item';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-comment-list',
@@ -30,7 +31,8 @@ export class CommentListComponent implements OnInit, OnDestroy {
 
   constructor(
     private commentService: CommentService,
-    private signalRService: SignalRService
+    private signalRService: SignalRService,
+    public i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -122,11 +124,7 @@ export class CommentListComponent implements OnInit, OnDestroy {
         comment.replies.push(reply);
         return true;
       }
-      if (comment.replies && comment.replies.length > 0) {
-        if (this.addReplyToTree(comment.replies, reply)) {
-          return true;
-        }
-      }
+      if (comment.replies?.length && this.addReplyToTree(comment.replies, reply)) return true;
     }
     return false;
   }
