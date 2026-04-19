@@ -45,6 +45,7 @@ export class CommentListComponent implements OnInit, OnDestroy {
         if (this.sortBy === 'createdAt' && this.sortDescending && this.currentPage === 1) {
           this.comments.unshift(newComment);
           this.totalCount++;
+          this.totalPages = Math.ceil(this.totalCount / this.pageSize);
           if (this.comments.length > this.pageSize) {
             this.comments.pop();
           }
