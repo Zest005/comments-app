@@ -1,6 +1,8 @@
 ﻿using CommentsApp.Application.Common.Interfaces;
 using CommentsApp.Application.DTOs;
 using CommentsApp.Domain.Entities;
+using CommentsApp.Domain.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace CommentsApp.Application.Services
 {
@@ -9,6 +11,8 @@ namespace CommentsApp.Application.Services
         private readonly ICommentRepository _commentRepository;
         private readonly ICaptchaService _captchaService;
         private readonly IFileService _fileService;
+
+        private static readonly HashSet<string> AllowedTags = new() { "a", "code", "i", "strong" };
 
         public CommentService(ICommentRepository commentRepository, ICaptchaService captchaService, IFileService fileService)
         {
@@ -36,90 +40,84 @@ namespace CommentsApp.Application.Services
             string? fileName = null,
             string? fileContentType = null)
         {
-            if (fileData != null && fileName != null)
-            {
-                if (string.IsNullOrWhiteSpace(dto.CaptchaId) || string.IsNullOrWhiteSpace(dto.CaptchaText))
-                {
-                    throw new InvalidOperationException("CAPTCHA is required when uploading a file.");
-                }
-
-                var isCaptchaValid = _captchaService.ValidateCaptcha(dto.CaptchaId, dto.CaptchaText);
-                if (!isCaptchaValid)
-                {
-                    throw new InvalidOperationException("Invalid CAPTCHA.");
-                }
-            }
-
-            var tagError = ValidateHtmlTags(dto.Text);
-            if (tagError != null)
-                throw new InvalidOperationException(tagError);
-
-            var sanitizedText = SanitizeHtml(dto.Text);
+            ValidateCaptchaIfNeeded(dto, fileData != null && fileName != null);
+            ValidateHtmlTags(dto.Text);
 
             var comment = new Comment
             {
                 UserName = dto.UserName.Trim(),
                 Email = dto.Email.Trim().ToLower(),
                 HomePage = string.IsNullOrWhiteSpace(dto.HomePage) ? null : dto.HomePage.Trim(),
-                Text = sanitizedText,
+                Text = SanitizeHtml(dto.Text),
                 CreatedAt = DateTime.UtcNow,
                 ParentCommentId = dto.ParentCommentId
             };
 
             if (fileData != null && fileName != null && fileContentType != null)
-            {
-                var uploadResult = await _fileService.SaveFileAsync(fileData, fileName, fileContentType);
-                
-                if (!uploadResult.Success)
-                    throw new InvalidOperationException($"File upload failed: {uploadResult.ErrorMessage}");
-
-                comment.Attachment = new CommentAttachment
-                {
-                    FileName = fileName,
-                    StoredFilePath = uploadResult.StoredFilePath,
-                    ContentType = fileContentType,
-                    FileSize = uploadResult.FileSize
-                };
-            }
+                comment.Attachment = await ProcessFileAsync(fileData, fileName, fileContentType);
 
             var savedComment = await _commentRepository.AddAsync(comment);
-
             return MapToDto(savedComment);
         }
 
-        private string? ValidateHtmlTags(string input)
+        private void ValidateCaptchaIfNeeded(CreateCommentDto dto, bool hasFile)
         {
-            var allowedTags = new HashSet<string> { "a", "code", "i", "strong" };
+            if (!hasFile) return;
+
+            if (string.IsNullOrWhiteSpace(dto.CaptchaId) || string.IsNullOrWhiteSpace(dto.CaptchaText))
+                throw new CaptchaValidationException("CAPTCHA is required when uploading a file.");
+
+            if (!_captchaService.ValidateCaptcha(dto.CaptchaId, dto.CaptchaText))
+                throw new CaptchaValidationException("Invalid CAPTCHA.");
+        }
+
+        private static void ValidateHtmlTags(string input)
+        {
             var tagStack = new Stack<string>();
+            var tagMatches = Regex.Matches(input, @"<(/?)(\w+)([^>]*)>");
 
-            var tagMatches = System.Text.RegularExpressions.Regex.Matches(input, @"<(/?)(\w+)([^>]*)>");
-
-            foreach (System.Text.RegularExpressions.Match match in tagMatches)
+            foreach (Match match in tagMatches)
             {
                 var isClosing = match.Groups[1].Value == "/";
                 var tagName = match.Groups[2].Value.ToLower();
 
-                if (!allowedTags.Contains(tagName))
+                if (!AllowedTags.Contains(tagName))
                     continue;
 
                 if (isClosing)
                 {
                     if (tagStack.Count == 0 || tagStack.Peek() != tagName)
-                        return $"Unexpected closing tag </{tagName}>. Tags must be properly nested.";
-
+                        throw new HtmlValidationException(
+                            $"Unexpected closing tag </{tagName}>. Tags must be properly nested.");
                     tagStack.Pop();
                 }
                 else
                     tagStack.Push(tagName);
             }
+
             if (tagStack.Count > 0)
             {
-                var unclosedTag = string.Join(", ", tagStack.Select(t => $"<{t}>"));
-
-                return $"Unclosed tags detected: {unclosedTag}. All tags must be properly closed.";
+                var unclosed = string.Join(", ", tagStack.Select(t => $"<{t}>"));
+                throw new HtmlValidationException(
+                    $"Unclosed tags detected: {unclosed}. All tags must be properly closed.");
             }
+        }
 
-            return null;
+        private async Task<CommentAttachment> ProcessFileAsync(
+            byte[] fileData, string fileName, string fileContentType)
+        {
+            var uploadResult = await _fileService.SaveFileAsync(fileData, fileName, fileContentType);
+
+            if (!uploadResult.Success)
+                throw new FileUploadException(uploadResult.ErrorMessage ?? "File upload failed.");
+
+            return new CommentAttachment
+            {
+                FileName = fileName,
+                StoredFilePath = uploadResult.StoredFilePath,
+                ContentType = fileContentType,
+                FileSize = uploadResult.FileSize
+            };
         }
 
         private CommentDto MapToDto(Comment comment)
@@ -149,63 +147,37 @@ namespace CommentsApp.Application.Services
             };
         }
 
-        private string SanitizeHtml(string input)
+        private static string SanitizeHtml(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
 
-            var allowedTags = new HashSet<string> { "a", "code", "i", "strong" };
+            var result = Regex.Replace(input, @"<(/?)(\w+)([^>]*)>", match =>
+            {
+                var tagName = match.Groups[2].Value.ToLower();
 
-            var result = System.Text.RegularExpressions.Regex.Replace(
-                input,
-                @"<(/?)(\w+)([^>]*)>",
-                match =>
+                if (!AllowedTags.Contains(tagName))
+                    return match.Value.Replace("<", "&lt;").Replace(">", "&gt;");
+
+                if (tagName == "a" && !match.Groups[1].Value.Contains("/"))
                 {
-                    var tagName = match.Groups[2].Value.ToLower();
+                    var attributes = match.Groups[3].Value;
+                    var href = Regex.Match(attributes, @"href\s*=\s*""([^""]*)""|href\s*=\s*'([^']*)'");
+                    var title = Regex.Match(attributes, @"title\s*=\s*""([^""]*)""|title\s*=\s*'([^']*)'");
 
-                    if (!allowedTags.Contains(tagName))
-                    {
-                        return match.Value
-                            .Replace("<", "&lt;")
-                            .Replace(">", "&gt;");
-                    }
+                    var cleanTag = "<a";
+                    if (href.Success)
+                        cleanTag += $@" href=""{(href.Groups[1].Success ? href.Groups[1].Value : href.Groups[2].Value)}""";
+                    if (title.Success)
+                        cleanTag += $@" title=""{(title.Groups[1].Success ? title.Groups[1].Value : title.Groups[2].Value)}""";
+                    cleanTag += @" target=""_blank"" rel=""noopener noreferrer"">";
+                    return cleanTag;
+                }
 
-                    if (tagName == "a" && !match.Groups[1].Value.Contains("/"))
-                    {
-                        var attributes = match.Groups[3].Value;
-                        var href = System.Text.RegularExpressions.Regex.Match(
-                            attributes, @"href\s*=\s*""([^""]*)""|href\s*=\s*'([^']*)'");
-                        var title = System.Text.RegularExpressions.Regex.Match(
-                            attributes, @"title\s*=\s*""([^""]*)""|title\s*=\s*'([^']*)'");
+                return match.Value;
+            });
 
-                        var cleanTag = "<a";
-                        if (href.Success)
-                        {
-                            var hrefValue = href.Groups[1].Success
-                                ? href.Groups[1].Value
-                                : href.Groups[2].Value;
-                            cleanTag += $@" href=""{hrefValue}""";
-                        }
-                        if (title.Success)
-                        {
-                            var titleValue = title.Groups[1].Success
-                                ? title.Groups[1].Value
-                                : title.Groups[2].Value;
-                            cleanTag += $@" title=""{titleValue}""";
-                        }
-
-                        cleanTag += @" target=""_blank"" rel=""noopener noreferrer""";
-                        cleanTag += ">";
-
-                        return cleanTag;
-                    }
-
-                    return match.Value;
-                });
-
-            result = result.Replace("\r\n", "<br>").Replace("\n", "<br>");
-
-            return result;
+            return result.Replace("\r\n", "<br>").Replace("\n", "<br>");
         }
     }
 }
