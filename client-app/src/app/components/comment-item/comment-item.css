@@ -96,12 +96,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  z-index: 9999;
+  animation: lbFadeIn 0.3s ease;
 }
 
 .lightbox-overlay.closing {
-  animation: fadeOut 0.3s ease forwards;
+  animation: lbFadeOut 0.3s ease forwards;
 }
 
 .lightbox-content {
@@ -109,16 +109,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: scaleIn 0.3s ease;
+  animation: lbScaleIn 0.3s ease;
 }
 
 .lightbox-overlay.closing .lightbox-content {
-  animation: scaleOut 0.3s ease forwards;
+  animation: lbScaleOut 0.3s ease forwards;
 }
 
 .lightbox-content img {
   max-width: 90vw;
-  max-height: 80vh;
+  max-height: 85vh;
   border-radius: 4px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
@@ -189,15 +189,15 @@
 .replies {
   margin-left: 20px;
   margin-top: 8px;
-  overflow: hidden;
 }
 
 .replies-enter {
-  animation: slideDown 0.3s ease forwards;
+  animation: repliesFadeIn 0.3s ease forwards;
 }
 
 .replies-leave {
-  animation: slideUp 0.3s ease forwards;
+  animation: repliesFadeOut 0.3s ease forwards;
+  pointer-events: none;
 }
 
 @keyframes fadeIn {
@@ -220,28 +220,17 @@
   to { transform: scale(0.8); opacity: 0; }
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    max-height: 5000px;
-    transform: translateY(0);
-  }
+@keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lbFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes lbScaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes lbScaleOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0.8); opacity: 0; } }
+
+@keyframes repliesFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 1;
-    max-height: 5000px;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-  }
+@keyframes repliesFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
