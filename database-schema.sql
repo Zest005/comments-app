@@ -3,11 +3,11 @@ USE CommentsAppDb;
 
 CREATE TABLE Comments (
     Id              INT             NOT NULL AUTO_INCREMENT,
-    UserName        NVARCHAR(50)    NOT NULL,
-    Email           NVARCHAR(254)   NOT NULL,
+    UserName        NVARCHAR(30)    NOT NULL,
+    Email           NVARCHAR(255)   NOT NULL,
     HomePage        NVARCHAR(2048)  NULL,
-    Text            NVARCHAR(4000)  NOT NULL,
-    CreatedAt       DATETIME2       NOT NULL,
+    Text            NVARCHAR(MAX)   NOT NULL,
+    CreatedAt       DATETIME2(7)    NOT NULL,
     ParentCommentId INT             NULL,
 
     CONSTRAINT PK_Comments PRIMARY KEY (Id),
@@ -21,8 +21,8 @@ CREATE TABLE CommentAttachments (
     Id              INT             NOT NULL AUTO_INCREMENT,
     CommentId       INT             NOT NULL,
     FileName        NVARCHAR(255)   NOT NULL,
-    StoredFilePath  NVARCHAR(500)   NOT NULL,
-    ContentType     NVARCHAR(100)   NOT NULL,
+    StoredFilePath  NVARCHAR(2048)  NOT NULL,
+    ContentType     NVARCHAR(255)   NOT NULL,
     FileSize        BIGINT          NOT NULL,
 
     CONSTRAINT PK_CommentAttachments PRIMARY KEY (Id),
