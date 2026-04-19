@@ -11,5 +11,7 @@
         public int? ParentCommentId { get; set; }
         public AttachmentDto? Attachment { get; set; }
         public List<CommentDto> Replies { get; set; } = new List<CommentDto>();
+
+        public int ReplyCount { get; set; }
     }
 }

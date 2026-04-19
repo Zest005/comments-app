@@ -8,6 +8,7 @@ export interface Comment {
   parentCommentId: number | null;
   attachment: Attachment | null;
   replies: Comment[];
+  replyCount: number;
 }
 
 export interface Attachment {

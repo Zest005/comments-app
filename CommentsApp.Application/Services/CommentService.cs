@@ -120,6 +120,19 @@ namespace CommentsApp.Application.Services
             };
         }
 
+        public async Task<PagedResultDto<CommentDto>> GetRepliesAsync(int parentId, int skip, int take)
+        {
+            var (replies, totalCount) = await _commentRepository.GetRepliesAsync(parentId, skip, take);
+
+            return new PagedResultDto<CommentDto>
+            {
+                Items = replies.Select(MapToDto).ToList(),
+                TotalCount = totalCount,
+                Page = skip / take + 1,
+                PageSize = take
+            };
+        }
+
         private CommentDto MapToDto(Comment comment)
         {
             return new CommentDto
@@ -138,12 +151,9 @@ namespace CommentsApp.Application.Services
                     ContentType = comment.Attachment.ContentType,
                     FileSize = comment.Attachment.FileSize,
                     Url = $"/api/attachments/{comment.Id}"
-                }
-                : null,
-                Replies = comment.Replies
-                    .OrderBy(r => r.CreatedAt)
-                    .Select(MapToDto)
-                    .ToList()
+                } : null,
+                Replies = new List<CommentDto>(),
+                ReplyCount = comment.Replies?.Count ?? 0
             };
         }
 

@@ -63,7 +63,10 @@ export class I18nService {
       'enterUrl': 'Enter URL:',
       'linkText': 'link text',
       'invalidCaptcha': 'Invalid CAPTCHA.',
-      'invalidHtmlTags': 'HTML tags are not properly closed. Check your markup.'
+      'invalidHtmlTags': 'HTML tags are not properly closed. Check your markup.',
+      'showReplies': 'Show replies',
+      'hideReplies': 'Hide replies',
+      'loadMore': 'Load more'
     },
     uk: {
       'title': 'Коментарі',
@@ -119,7 +122,10 @@ export class I18nService {
       'enterUrl': 'Введіть URL:',
       'linkText': 'текст посилання',
       'invalidCaptcha': 'Невірна CAPTCHA.',
-      'invalidHtmlTags': 'HTML теги не закриті коректно. Перевірте розмітку.'
+      'invalidHtmlTags': 'HTML теги не закриті коректно. Перевірте розмітку.',
+      'showReplies': 'Показати відповіді',
+      'hideReplies': 'Сховати відповіді',
+      'loadMore': 'Завантажити ще'
     }
   };
 

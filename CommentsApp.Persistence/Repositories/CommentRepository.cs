@@ -32,35 +32,75 @@ namespace CommentsApp.Persistence.Repositories
                 _ => sortDescending ? query.OrderByDescending(c => c.CreatedAt) : query.OrderBy(c => c.CreatedAt)
             };
 
-            var rootComments = await query
+            var comments = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(c => c.Attachment)
                 .AsSplitQuery()
                 .ToListAsync();
 
-            if (rootComments.Count > 0)
+            if (comments.Count > 0)
             {
-                var rootIds = rootComments.Select(c => c.Id).ToList();
-                await LoadRepliesRecursiveAsync(rootIds);
+                var rootIds = comments.Select(c => c.Id).ToList();
+                var replyCounts = await _context.Comments
+                    .Where(c => c.ParentCommentId != null && rootIds.Contains(c.ParentCommentId.Value))
+                    .GroupBy(c => c.ParentCommentId)
+                    .Select(g => new { ParentId = g.Key, Count = g.Count() })
+                    .ToListAsync();
+
+                foreach (var rc in replyCounts)
+                {
+                    var parent = comments.FirstOrDefault(c => c.Id == rc.ParentId);
+                    if (parent != null)
+                    {
+                        parent.Replies = Enumerable.Range(0, rc.Count)
+                            .Select(_ => new Comment())
+                            .ToList();
+                    }
+                }
             }
 
-            return (rootComments, totalCount);
+            return (comments, totalCount);
         }
 
-        private async Task LoadRepliesRecursiveAsync(List<int> parentIds)
+        public async Task<(List<Comment> Replies, int TotalCount)> GetRepliesAsync(
+            int parentId, int skip, int take)
         {
-            var children = await _context.Comments
-                .Where(c => c.ParentCommentId != null && parentIds.Contains(c.ParentCommentId.Value))
+            var query = _context.Comments
+                .Where(c => c.ParentCommentId == parentId)
+                .OrderBy(c => c.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+
+            var replies = await query
+                .Skip(skip)
+                .Take(take)
                 .Include(c => c.Attachment)
                 .AsSplitQuery()
                 .ToListAsync();
 
-            if (children.Count > 0)
+            if (replies.Count > 0)
             {
-                var childIds = children.Select(c => c.Id).ToList();
-                await LoadRepliesRecursiveAsync(childIds);
+                var replyIds = replies.Select(c => c.Id).ToList();
+                var childCounts = await _context.Comments
+                    .Where(c => c.ParentCommentId != null && replyIds.Contains(c.ParentCommentId.Value))
+                    .GroupBy(c => c.ParentCommentId)
+                    .Select(g => new { ParentId = g.Key, Count = g.Count() })
+                    .ToListAsync();
+
+                foreach (var cc in childCounts)
+                {
+                    var reply = replies.FirstOrDefault(c => c.Id == cc.ParentId);
+                    if (reply != null)
+                    {
+                        reply.Replies = Enumerable.Range(0, cc.Count)
+                            .Select(_ => new Comment())
+                            .ToList();
+                    }
+                }
             }
+
+            return (replies, totalCount);
         }
 
         public Task<Comment?> GetByIdAsync(int id)

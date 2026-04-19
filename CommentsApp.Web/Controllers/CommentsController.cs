@@ -41,6 +41,21 @@ namespace CommentsApp.Web.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{parentId:int}/replies")]
+        public async Task<ActionResult<PagedResultDto<CommentDto>>> GetReplies(
+            int parentId,
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 3)
+        {
+            if (skip < 0)
+                skip = 0;
+            if (take < 1 || take > 25)
+                take = 3;
+
+            var result = await _commentService.GetRepliesAsync(parentId, skip, take);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<ActionResult<CommentDto>> CreateComment(
             [FromForm] CreateCommentDto dto,
@@ -73,7 +88,16 @@ namespace CommentsApp.Web.Controllers
             {
                 var comment = await _commentService.CreateCommentAsync(dto, fileData, fileName, fileContentType);
 
-                await _hubContext.Clients.All.SendAsync("NewComment", comment);
+                if (comment.ParentCommentId == null)
+                    await _hubContext.Clients.All.SendAsync("NewComment", comment);
+                else
+                {
+                    await _hubContext.Clients.All.SendAsync("NewReply", new
+                    {
+                        ParentCommentId = comment.ParentCommentId,
+                        ReplyId = comment.Id
+                    });
+                }
 
                 return CreatedAtAction(nameof(GetComments), new { id = comment.Id }, comment);
             }

@@ -15,5 +15,7 @@ namespace CommentsApp.Application.Common.Interfaces
         Task<Comment> AddAsync(Comment comment);
 
         Task<int> GetRootCommentsCountAsync();
+
+        Task<(List<Comment> Replies, int TotalCount)> GetRepliesAsync(int parentId, int skip, int take);
     }
 }
