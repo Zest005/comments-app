@@ -92,15 +92,18 @@ Open `http://localhost:4200`
 
 ### Prerequisites
 
-- Docker Desktop
+- Docker Desktop (download from https://www.docker.com/products/docker-desktop/)
 
 ### Start
+
+1. Install and launch **Docker Desktop**. Wait until the icon in the system tray stops animating (Docker is ready).
+2. Run the following command in the project root directory:
 
 ```bash
 docker-compose up --build
 ```
 
-Open `http://localhost:8080`
+3. Open `http://localhost:8080`
 
 ### Stop
 
@@ -259,15 +262,18 @@ ng serve
 
 ### Необхідне ПЗ
 
-- Docker Desktop
+- Docker Desktop (завантажити з https://www.docker.com/products/docker-desktop/)
 
 ### Запуск
+
+1. Встановіть та запустіть **Docker Desktop**. Зачекайте поки іконка в треї перестане анімуватися (Docker готовий).
+2. Виконайте наступну команду в кореневій директорії проєкту:
 
 ```bash
 docker-compose up --build
 ```
 
-Відкрийте `http://localhost:8080`
+3. Відкрийте `http://localhost:8080`
 
 ### Зупинка
 
