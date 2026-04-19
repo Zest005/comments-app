@@ -27,6 +27,13 @@ export class CommentService {
     return this.http.get<PagedResult<Comment>>(this.apiUrl, { params });
   }
 
+  getReplies(parentId: number, skip: number = 0, take: number = 3): Observable<PagedResult<Comment>> {
+    const params = new HttpParams()
+      .set('skip', skip.toString())
+      .set('take', take.toString());
+    return this.http.get<PagedResult<Comment>>(`${this.apiUrl}/${parentId}/replies`, { params });
+  }
+
   createComment(
     data: {
       userName: string;

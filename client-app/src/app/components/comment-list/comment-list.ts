@@ -52,10 +52,6 @@ export class CommentListComponent implements OnInit, OnDestroy {
         } else {
           this.loadComments();
         }
-      } else {
-        if (!this.addReplyToTree(this.comments, newComment)) {
-          this.loadComments();
-        }
       }
     });
   }

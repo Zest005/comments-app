@@ -1,8 +1,5 @@
 ﻿using CommentsApp.Application.DTOs;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CommentsApp.Application.Common.Validators
 {

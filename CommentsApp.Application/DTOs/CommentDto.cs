@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CommentsApp.Application.DTOs
+﻿namespace CommentsApp.Application.DTOs
 {
     public class CommentDto
     {
@@ -15,5 +11,7 @@ namespace CommentsApp.Application.DTOs
         public int? ParentCommentId { get; set; }
         public AttachmentDto? Attachment { get; set; }
         public List<CommentDto> Replies { get; set; } = new List<CommentDto>();
+
+        public int ReplyCount { get; set; }
     }
 }

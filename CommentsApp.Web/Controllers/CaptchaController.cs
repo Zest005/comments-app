@@ -1,4 +1,5 @@
 ﻿using CommentsApp.Application.Common.Interfaces;
+using CommentsApp.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommentsApp.Web.Controllers
@@ -19,9 +20,11 @@ namespace CommentsApp.Web.Controllers
         {
             var (captchaId, imageBytes) = _captchaService.GenerateCaptcha();
 
-            var base64Image = Convert.ToBase64String(imageBytes);
-
-            return Ok(new { CaptchaId = captchaId, ImageBase64 = $"data:image/png;base64,{base64Image}" });
+            return Ok(new CaptchaResponseDto
+            {
+                CaptchaId = captchaId,
+                ImageBase64 = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}"
+            });
         }
     }
 }
