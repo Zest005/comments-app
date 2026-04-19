@@ -6,6 +6,7 @@ import { CommentFormComponent } from '../comment-form/comment-form';
 import { CommentService } from '../../services/comment.service';
 import { SignalRService } from '../../services/signalr.service';
 import { I18nService } from '../../services/i18n.service';
+import { LightboxService } from '../../services/lightbox.service';
 
 @Component({
   selector: 'app-comment-item',
@@ -18,9 +19,6 @@ export class CommentItemComponent implements OnInit, OnDestroy {
   @Input() comment!: Comment;
 
   showReplyForm = false;
-  showLightbox = false;
-  closingLightbox = false;
-  lightboxUrl = '';
 
   repliesLoaded = false;
   repliesVisible = false;
@@ -31,7 +29,10 @@ export class CommentItemComponent implements OnInit, OnDestroy {
 
   private replySub!: Subscription;
 
-  constructor(public i18n: I18nService, private commentService: CommentService, private signalRService: SignalRService) {}
+  constructor(public i18n: I18nService,
+    private commentService: CommentService,
+    private signalRService: SignalRService,
+    private lightboxService: LightboxService) {}
 
   ngOnInit(): void {
     this.replySub = this.signalRService.newReply$.subscribe(reply => {
@@ -110,18 +111,7 @@ export class CommentItemComponent implements OnInit, OnDestroy {
   }
 
   openLightbox(url: string): void {
-    this.lightboxUrl = url;
-    this.showLightbox = true;
-    this.closingLightbox = false;
-  }
-
-  closeLightbox(): void {
-    this.closingLightbox = true;
-    setTimeout(() => {
-      this.showLightbox = false;
-      this.closingLightbox = false;
-      this.lightboxUrl = '';
-    }, 300);
+    this.lightboxService.open(url);
   }
 
   formatDate(dateStr: string): string {
