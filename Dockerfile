@@ -29,8 +29,13 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libfontconfig1 libfreetype6 && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+    libfontconfig1 \
+    libfreetype6 \
+    libx11-6 \
+    libgl1 \
+    fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=backend-build /app/publish .
 COPY --from=frontend-build /app/client-app/dist/client-app/browser wwwroot
