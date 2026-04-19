@@ -36,7 +36,21 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
+    var retries = 10;
+    while (retries > 0)
+    {
+        try
+        {
+            dbContext.Database.Migrate();
+            break;
+        }
+        catch (Exception)
+        {
+            retries--;
+            if (retries == 0) throw;
+            Thread.Sleep(3000);
+        }
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -45,7 +59,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowAngular");
 

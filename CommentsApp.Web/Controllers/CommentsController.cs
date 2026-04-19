@@ -29,7 +29,7 @@ namespace CommentsApp.Web.Controllers
             [FromQuery] string sortBy = "createdAt",
             [FromQuery] bool sortDescending = true)
         {
-            if (page == 1)
+            if (page < 1)
                 page = 1;
 
             if (pageSize < 1 || pageSize > 25)
