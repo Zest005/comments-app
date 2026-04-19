@@ -118,15 +118,15 @@ The database schema files are available at:
 
 **Comments**
 
-| Column          | Type          | Description                    |
-|-----------------|---------------|--------------------------------|
-| Id              | INT (PK)      | Auto-increment primary key     |
-| UserName        | NVARCHAR(50)  | Latin letters and digits only  |
-| Email           | NVARCHAR(254) | Valid email format             |
-| HomePage        | NVARCHAR(2048)| Optional URL                   |
-| Text            | NVARCHAR(MAX) | Comment text (sanitized HTML)  |
-| CreatedAt       | DATETIME2     | UTC timestamp                  |
-| ParentCommentId | INT (FK, NULL)| Self-referencing for replies   |
+| Column          | Type                | Description                    |
+|-----------------|---------------------|--------------------------------|
+| Id              | INT (PK)            | Auto-increment primary key     |
+| UserName        | NVARCHAR(30)        | Latin letters and digits only  |
+| Email           | NVARCHAR(255)       | Valid email format             |
+| HomePage        | NVARCHAR(2048) NULL | Optional URL                   |
+| Text            | NVARCHAR(MAX)       | Comment text (sanitized HTML)  |
+| CreatedAt       | DATETIME2           | UTC timestamp                  |
+| ParentCommentId | INT (FK) NULL       | Self-referencing for replies   |
 
 **CommentAttachments**
 
@@ -135,8 +135,8 @@ The database schema files are available at:
 | Id             | INT (PK)      | Auto-increment primary key      |
 | CommentId      | INT (FK)      | Reference to parent comment     |
 | FileName       | NVARCHAR(255) | Original file name              |
-| StoredFilePath | NVARCHAR(500) | Server-side file path           |
-| ContentType    | NVARCHAR(100) | MIME type                       |
+| StoredFilePath | NVARCHAR(2048) | Server-side file path           |
+| ContentType    | NVARCHAR(255) | MIME type                       |
 | FileSize       | BIGINT        | File size in bytes              |
 
 ## API Endpoints
@@ -277,15 +277,15 @@ docker-compose down
 
 **Comments (Коментарі)**
 
-| Стовпець        | Тип           | Опис                            |
-|-----------------|---------------|---------------------------------|
-| Id              | INT (PK)      | Автоінкрементний первинний ключ |
-| UserName        | NVARCHAR(50)  | Тільки латинські літери та цифри|
-| Email           | NVARCHAR(254) | Валідний формат email           |
-| HomePage        | NVARCHAR(2048)| Необов'язкове URL               |
-| Text            | NVARCHAR(MAX) | Текст коментаря (очищений HTML) |
-| CreatedAt       | DATETIME2     | Мітка часу UTC                  |
-| ParentCommentId | INT (FK, NULL)| Самопосилання для відповідей    |
+| Стовпець        | Тип                 | Опис                            |
+|-----------------|---------------------|---------------------------------|
+| Id              | INT (PK)            | Автоінкрементний первинний ключ |
+| UserName        | NVARCHAR(30)        | Тільки латинські літери та цифри|
+| Email           | NVARCHAR(255)       | Валідний формат email           |
+| HomePage        | NVARCHAR(2048) NULL | Необов'язкове URL               |
+| Text            | NVARCHAR(MAX)       | Текст коментаря (очищений HTML) |
+| CreatedAt       | DATETIME2           | Мітка часу UTC                  |
+| ParentCommentId | INT (FK) NULL       | Самопосилання для відповідей    |
 
 **CommentAttachments (Вкладення)**
 
@@ -294,8 +294,8 @@ docker-compose down
 | Id             | INT (PK)      | Автоінкрементний первинний ключ |
 | CommentId      | INT (FK)      | Посилання на коментар           |
 | FileName       | NVARCHAR(255) | Оригінальна назва файлу         |
-| StoredFilePath | NVARCHAR(500) | Шлях до файлу на сервері        |
-| ContentType    | NVARCHAR(100) | MIME тип                        |
+| StoredFilePath | NVARCHAR(2048) | Шлях до файлу на сервері        |
+| ContentType    | NVARCHAR(255) | MIME тип                        |
 | FileSize       | BIGINT        | Розмір файлу в байтах           |
 
 ## API Ендпоінти
