@@ -155,6 +155,8 @@ SignalR Hub: `/hubs/comments`
 Events:
 - `NewComment` — fired when a new comment is created, broadcasts to all connected clients
 
+
+
 ### UKRAINIAN
 
 # CommentsApp — SPA Система коментарів
