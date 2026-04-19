@@ -43,6 +43,13 @@ namespace CommentsApp.Application.Services
             ValidateCaptchaIfNeeded(dto, fileData != null && fileName != null);
             ValidateHtmlTags(dto.Text);
 
+            if (dto.ParentCommentId.HasValue)
+            {
+                var parentExists = await _commentRepository.GetByIdAsync(dto.ParentCommentId.Value);
+                if (parentExists == null)
+                    throw new BusinessException("Parent comment not found.", "general");
+            }
+
             var comment = new Comment
             {
                 UserName = dto.UserName.Trim(),
