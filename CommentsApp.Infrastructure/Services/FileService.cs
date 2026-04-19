@@ -16,22 +16,24 @@ namespace CommentsApp.Infrastructure.Services
             "image/gif"
         };
 
-        private const long MaxTextFileSize = 100 * 1024; // 100 KB
-
+        private const long MaxTextFileSize = 100 * 1024;
         private const int MaxImageWidth = 320;
         private const int MaxImageHeight = 240;
+
+        private static readonly byte[] JpegMagic = { 0xFF, 0xD8, 0xFF };
+        private static readonly byte[] PngMagic = { 0x89, 0x50, 0x4E, 0x47 };
+        private static readonly byte[] GifMagic87 = { 0x47, 0x49, 0x46, 0x38, 0x37, 0x61 }; // GIF87a
+        private static readonly byte[] GifMagic89 = { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 }; // GIF89a
 
         public FileService(string uploadsPath)
         {
             _uploadsPath = uploadsPath;
-
             if (!Directory.Exists(_uploadsPath))
-            {
                 Directory.CreateDirectory(_uploadsPath);
-            }
         }
 
-        public async Task<FileUploadResult> SaveFileAsync(byte[] fileData, string fileName, string contentType)
+        public async Task<FileUploadResult> SaveFileAsync(
+            byte[] fileData, string fileName, string contentType)
         {
             var isImage = AllowedImageTypes.Contains(contentType);
             var isTextFile = contentType.Equals("text/plain", StringComparison.OrdinalIgnoreCase);
@@ -42,6 +44,15 @@ namespace CommentsApp.Infrastructure.Services
                 {
                     Success = false,
                     ErrorMessage = "Only JPG, PNG, GIF images and TXT files are allowed."
+                };
+            }
+
+            if (isImage && !IsValidImage(fileData))
+            {
+                return new FileUploadResult
+                {
+                    Success = false,
+                    ErrorMessage = "File content does not match a valid image format (JPG, PNG, GIF)."
                 };
             }
 
@@ -58,7 +69,18 @@ namespace CommentsApp.Infrastructure.Services
 
             if (isImage)
             {
-                dataToSave = ResizeImageIfNeeded(fileData, contentType);
+                try
+                {
+                    dataToSave = ResizeImageIfNeeded(fileData, contentType);
+                }
+                catch (Exception)
+                {
+                    return new FileUploadResult
+                    {
+                        Success = false,
+                        ErrorMessage = "Failed to process image. The file may be corrupted."
+                    };
+                }
             }
             else
             {
@@ -66,6 +88,10 @@ namespace CommentsApp.Infrastructure.Services
             }
 
             var extension = Path.GetExtension(fileName).ToLower();
+            var allowedExtensions = new HashSet<string> { ".jpg", ".jpeg", ".png", ".gif", ".txt" };
+            if (!allowedExtensions.Contains(extension))
+                extension = isImage ? ".jpg" : ".txt";
+
             var uniqueFileName = $"{Guid.NewGuid()}{extension}";
             var filePath = Path.Combine(_uploadsPath, uniqueFileName);
 
@@ -77,6 +103,26 @@ namespace CommentsApp.Infrastructure.Services
                 StoredFilePath = uniqueFileName,
                 FileSize = dataToSave.Length
             };
+        }
+
+        private static bool IsValidImage(byte[] data)
+        {
+            if (data.Length < 4) return false;
+
+            return StartsWith(data, JpegMagic)
+                || StartsWith(data, PngMagic)
+                || StartsWith(data, GifMagic87)
+                || StartsWith(data, GifMagic89);
+        }
+
+        private static bool StartsWith(byte[] data, byte[] magic)
+        {
+            if (data.Length < magic.Length) return false;
+            for (int i = 0; i < magic.Length; i++)
+            {
+                if (data[i] != magic[i]) return false;
+            }
+            return true;
         }
 
         private byte[] ResizeImageIfNeeded(byte[] imageData, string contentType)
@@ -113,7 +159,6 @@ namespace CommentsApp.Infrastructure.Services
             };
 
             using var data = image.Encode(format, 90);
-
             return data.ToArray();
         }
     }
