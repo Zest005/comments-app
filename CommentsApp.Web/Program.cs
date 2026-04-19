@@ -2,6 +2,7 @@ using CommentsApp.Application;
 using CommentsApp.Infrastructure;
 using CommentsApp.Persistence;
 using CommentsApp.Web.Hubs;
+using CommentsApp.Web.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,8 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
