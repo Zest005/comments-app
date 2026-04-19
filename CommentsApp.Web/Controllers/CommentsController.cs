@@ -1,6 +1,7 @@
 ﻿using CommentsApp.Application.Common.Validators;
 using CommentsApp.Application.DTOs;
 using CommentsApp.Application.Services;
+using CommentsApp.Domain.Exceptions;
 using CommentsApp.Web.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -76,21 +77,13 @@ namespace CommentsApp.Web.Controllers
 
                 return CreatedAtAction(nameof(GetComments), new { id = comment.Id }, comment);
             }
-            catch (InvalidOperationException ex)
+            catch (BusinessException ex)
             {
-                string fieldName;
-                if (ex.Message.Contains("CAPTCHA", StringComparison.OrdinalIgnoreCase))
-                    fieldName = "captchaText";
-                else if (ex.Message.Contains("tag", StringComparison.OrdinalIgnoreCase))
-                    fieldName = "text";
-                else
-                    fieldName = "general";
-
                 return BadRequest(new
                 {
                     Errors = new Dictionary<string, string[]>
                     {
-                        { fieldName, new[] { ex.Message } }
+                        { ex.FieldName, new[] { ex.Message } }
                     }
                 });
             }
