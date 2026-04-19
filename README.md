@@ -75,7 +75,7 @@ dotnet ef database update --project CommentsApp.Persistence --startup-project Co
 
 ```bash
 cd CommentsApp.Web
-dotnet run
+dotnet run --launch-profile https
 ```
 
 ### Frontend
@@ -92,15 +92,18 @@ Open `http://localhost:4200`
 
 ### Prerequisites
 
-- Docker Desktop
+- Docker Desktop (download from https://www.docker.com/products/docker-desktop/)
 
 ### Start
+
+1. Install and launch **Docker Desktop**. Wait until the icon in the system tray stops animating (Docker is ready).
+2. Run the following command in the project root directory:
 
 ```bash
 docker-compose up --build
 ```
 
-Open `http://localhost:8080`
+3. Open `http://localhost:8080`
 
 ### Stop
 
@@ -155,6 +158,14 @@ SignalR Hub: `/hubs/comments`
 Events:
 - `NewComment` — fired when a new comment is created, broadcasts to all connected clients
 
+## Demo Video
+
+[![Demo Video](https://img.shields.io/badge/YouTube-Demo-red?logo=youtube)](https://youtu.be/NkT5r_Ue_Tg)
+
+(https://youtu.be/NkT5r_Ue_Tg)
+
+
+-----------------------
 
 
 ### UKRAINIAN
@@ -234,7 +245,7 @@ dotnet ef database update --project CommentsApp.Persistence --startup-project Co
 
 ```bash
 cd CommentsApp.Web
-dotnet run
+dotnet run --launch-profile https
 ```
 
 ### Frontend
@@ -251,15 +262,18 @@ ng serve
 
 ### Необхідне ПЗ
 
-- Docker Desktop
+- Docker Desktop (завантажити з https://www.docker.com/products/docker-desktop/)
 
 ### Запуск
+
+1. Встановіть та запустіть **Docker Desktop**. Зачекайте поки іконка в треї перестане анімуватися (Docker готовий).
+2. Виконайте наступну команду в кореневій директорії проєкту:
 
 ```bash
 docker-compose up --build
 ```
 
-Відкрийте `http://localhost:8080`
+3. Відкрийте `http://localhost:8080`
 
 ### Зупинка
 
@@ -313,3 +327,9 @@ SignalR Hub: `/hubs/comments`
 
 Події:
 - `NewComment` — спрацьовує при створенні нового коментаря, надсилається всім підключеним клієнтам
+
+## Демо відео
+
+[![Демо відео](https://img.shields.io/badge/YouTube-Демо-red?logo=youtube)](https://youtu.be/NkT5r_Ue_Tg)
+
+(https://youtu.be/NkT5r_Ue_Tg)
