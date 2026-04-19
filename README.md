@@ -155,6 +155,14 @@ SignalR Hub: `/hubs/comments`
 Events:
 - `NewComment` — fired when a new comment is created, broadcasts to all connected clients
 
+## Demo Video
+
+[![Demo Video](https://img.shields.io/badge/YouTube-Demo-red?logo=youtube)](https://youtu.be/NkT5r_Ue_Tg)
+
+(https://youtu.be/NkT5r_Ue_Tg)
+
+
+-----------------------
 
 
 ### UKRAINIAN
@@ -313,3 +321,9 @@ SignalR Hub: `/hubs/comments`
 
 Події:
 - `NewComment` — спрацьовує при створенні нового коментаря, надсилається всім підключеним клієнтам
+
+## Демо відео
+
+[![Демо відео](https://img.shields.io/badge/YouTube-Демо-red?logo=youtube)](https://youtu.be/NkT5r_Ue_Tg)
+
+(https://youtu.be/NkT5r_Ue_Tg)
