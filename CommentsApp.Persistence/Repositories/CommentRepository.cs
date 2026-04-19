@@ -6,7 +6,7 @@ namespace CommentsApp.Persistence.Repositories
 {
     public class CommentRepository : ICommentRepository
     {
-        public readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public CommentRepository(ApplicationDbContext context)
         {
@@ -32,28 +32,40 @@ namespace CommentsApp.Persistence.Repositories
                 _ => sortDescending ? query.OrderByDescending(c => c.CreatedAt) : query.OrderBy(c => c.CreatedAt)
             };
 
-            var comments = await query
+            var rootComments = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(c => c.Attachment)
                 .AsSplitQuery()
                 .ToListAsync();
 
-            if (comments.Count > 0)
+            if (rootComments.Count > 0)
             {
-                await _context.Comments
-                    .Where(c => c.ParentCommentId != null)
-                    .Include(c => c.Attachment)
-                    .AsSplitQuery()
-                    .LoadAsync();
+                var rootIds = rootComments.Select(c => c.Id).ToList();
+                await LoadRepliesRecursiveAsync(rootIds);
             }
 
-            return (comments, totalCount);
+            return (rootComments, totalCount);
         }
 
-        public async Task<Comment?> GetByIdAsync(int id)
+        private async Task LoadRepliesRecursiveAsync(List<int> parentIds)
         {
-            return await _context.Comments
+            var children = await _context.Comments
+                .Where(c => c.ParentCommentId != null && parentIds.Contains(c.ParentCommentId.Value))
+                .Include(c => c.Attachment)
+                .AsSplitQuery()
+                .ToListAsync();
+
+            if (children.Count > 0)
+            {
+                var childIds = children.Select(c => c.Id).ToList();
+                await LoadRepliesRecursiveAsync(childIds);
+            }
+        }
+
+        public Task<Comment?> GetByIdAsync(int id)
+        {
+            return _context.Comments
                 .Include(c => c.Attachment)
                 .Include(c => c.Replies)
                     .ThenInclude(r => r.Attachment)
@@ -69,9 +81,9 @@ namespace CommentsApp.Persistence.Repositories
             return comment;
         }
 
-        public async Task<int> GetRootCommentsCountAsync()
+        public Task<int> GetRootCommentsCountAsync()
         {
-            return await _context.Comments.CountAsync(c => c.ParentCommentId == null);
+            return _context.Comments.CountAsync(c => c.ParentCommentId == null);
         }
     }
 }
