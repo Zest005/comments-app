@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnDestroy, Output } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentService } from '../../services/comment.service';
@@ -33,6 +34,8 @@ export class CommentFormComponent implements OnInit {
   previewHtml = '';
   showPreview = false;
 
+  private authSub!: Subscription;
+
   constructor(private commentService: CommentService, public i18n: I18nService, public auth: AuthService) {}
 
   ngOnInit(): void {
@@ -42,6 +45,21 @@ export class CommentFormComponent implements OnInit {
       this.email = user.email;
       this.homePage = user.homePage || '';
     }
+    this.authSub = this.auth.userChanged$.subscribe(user => {
+      if (user) {
+        this.userName = user.userName;
+        this.email = user.email;
+        this.homePage = user.homePage || '';
+      } else {
+        this.userName = '';
+        this.email = '';
+        this.homePage = '';
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.authSub?.unsubscribe();
   }
 
   loadCaptcha(): void {
