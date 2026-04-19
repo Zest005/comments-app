@@ -91,13 +91,7 @@ namespace CommentsApp.Web.Controllers
                 if (comment.ParentCommentId == null)
                     await _hubContext.Clients.All.SendAsync("NewComment", comment);
                 else
-                {
-                    await _hubContext.Clients.All.SendAsync("NewReply", new
-                    {
-                        ParentCommentId = comment.ParentCommentId,
-                        ReplyId = comment.Id
-                    });
-                }
+                    await _hubContext.Clients.All.SendAsync("NewReply", comment);
 
                 return CreatedAtAction(nameof(GetComments), new { id = comment.Id }, comment);
             }

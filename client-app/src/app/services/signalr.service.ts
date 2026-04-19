@@ -3,18 +3,13 @@ import { Subject } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
 import { Comment } from '../models/comment.model';
 
-export interface NewReplyNotification {
-  parentCommentId: number;
-  replyId: number;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRService {
   private hubConnection!: signalR.HubConnection;
   public newComment$ = new Subject<Comment>();
-  public newReply$ = new Subject<NewReplyNotification>();
+  public newReply$ = new Subject<Comment>();
 
   constructor(private ngZone: NgZone) {}
 
@@ -35,9 +30,9 @@ export class SignalRService {
       });
     });
 
-    this.hubConnection.on('NewReply', (notification: NewReplyNotification) => {
+    this.hubConnection.on('NewReply', (reply: Comment) => {
       this.ngZone.run(() => {
-        this.newReply$.next(notification);
+        this.newReply$.next(reply);
       });
     });
   }

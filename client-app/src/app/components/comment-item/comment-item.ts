@@ -34,13 +34,15 @@ export class CommentItemComponent implements OnInit, OnDestroy {
   constructor(public i18n: I18nService, private commentService: CommentService, private signalRService: SignalRService) {}
 
   ngOnInit(): void {
-    this.replySub = this.signalRService.newReply$.subscribe(notification => {
-      if (notification.parentCommentId === this.comment.id) {
+    this.replySub = this.signalRService.newReply$.subscribe(reply => {
+      if (reply.parentCommentId === this.comment.id) {
         this.comment.replyCount++;
         this.totalReplies++;
 
         if (this.repliesVisible) {
-          this.loadMoreReplies();
+          if (!this.loadedReplies.some(r => r.id === reply.id)) {
+            this.loadedReplies.push(reply);
+          }
         }
       }
     });
