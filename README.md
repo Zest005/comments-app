@@ -160,9 +160,9 @@ Events:
 
 ## Demo Video
 
-[![Demo Video](https://img.shields.io/badge/YouTube-Demo-red?logo=youtube)](https://youtu.be/NkT5r_Ue_Tg)
+[![Demo Video](https://img.shields.io/badge/YouTube-Demo-red?logo=youtube)](https://youtu.be/-3RaODNxPwQ)
 
-(https://youtu.be/NkT5r_Ue_Tg)
+(https://youtu.be/-3RaODNxPwQ)
 
 
 -----------------------
@@ -330,6 +330,6 @@ SignalR Hub: `/hubs/comments`
 
 ## Демо відео
 
-[![Демо відео](https://img.shields.io/badge/YouTube-Демо-red?logo=youtube)](https://youtu.be/NkT5r_Ue_Tg)
+[![Демо відео](https://img.shields.io/badge/YouTube-Демо-red?logo=youtube)](https://youtu.be/-3RaODNxPwQ)
 
-(https://youtu.be/NkT5r_Ue_Tg)
+(https://youtu.be/-3RaODNxPwQ)
