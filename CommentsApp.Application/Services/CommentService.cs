@@ -171,12 +171,16 @@ namespace CommentsApp.Application.Services
 
             var result = Regex.Replace(input, @"<(/?)(\w+)([^>]*)>", match =>
             {
+                var isClosing = match.Groups[1].Value == "/";
                 var tagName = match.Groups[2].Value.ToLower();
 
                 if (!AllowedTags.Contains(tagName))
                     return match.Value.Replace("<", "&lt;").Replace(">", "&gt;");
 
-                if (tagName == "a" && !match.Groups[1].Value.Contains("/"))
+                if (isClosing)
+                    return $"</{tagName}>";
+
+                if (tagName == "a")
                 {
                     var attributes = match.Groups[3].Value;
                     var href = Regex.Match(attributes, @"href\s*=\s*""([^""]*)""|href\s*=\s*'([^']*)'");
@@ -184,14 +188,29 @@ namespace CommentsApp.Application.Services
 
                     var cleanTag = "<a";
                     if (href.Success)
-                        cleanTag += $@" href=""{(href.Groups[1].Success ? href.Groups[1].Value : href.Groups[2].Value)}""";
+                    {
+                        var hrefValue = href.Groups[1].Success ? href.Groups[1].Value : href.Groups[2].Value;
+
+                        if (!hrefValue.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                            !hrefValue.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                        {
+                            hrefValue = "#";
+                        }
+
+                        hrefValue = System.Net.WebUtility.HtmlEncode(hrefValue);
+                        cleanTag += $@" href=""{hrefValue}""";
+                    }
                     if (title.Success)
-                        cleanTag += $@" title=""{(title.Groups[1].Success ? title.Groups[1].Value : title.Groups[2].Value)}""";
+                    {
+                        var titleValue = title.Groups[1].Success ? title.Groups[1].Value : title.Groups[2].Value;
+                        titleValue = System.Net.WebUtility.HtmlEncode(titleValue);
+                        cleanTag += $@" title=""{titleValue}""";
+                    }
                     cleanTag += @" target=""_blank"" rel=""noopener noreferrer"">";
                     return cleanTag;
                 }
 
-                return match.Value;
+                return $"<{tagName}>";
             });
 
             return result.Replace("\r\n", "<br>").Replace("\n", "<br>");
