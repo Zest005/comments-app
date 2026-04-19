@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CommentsApp.Domain.Entities
+﻿namespace CommentsApp.Domain.Entities
 {
     public class CommentAttachment
     {
@@ -11,7 +7,6 @@ namespace CommentsApp.Domain.Entities
         public string FileName { get; set; } = string.Empty;
         public string StoredFilePath { get; set; } = string.Empty;
         public string ContentType { get; set; } = string.Empty;
-        // ограничения по размеру для .txt
         public long FileSize { get; set; }
 
         public Comment Comment { get; set; } = null!;

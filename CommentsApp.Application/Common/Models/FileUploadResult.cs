@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CommentsApp.Application.Common.Models
+﻿namespace CommentsApp.Application.Common.Models
 {
     public class FileUploadResult
     {

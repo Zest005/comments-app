@@ -1,7 +1,4 @@
 ﻿using CommentsApp.Application.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CommentsApp.Application.Common.Interfaces
 {

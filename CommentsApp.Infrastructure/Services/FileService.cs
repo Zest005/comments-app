@@ -1,9 +1,6 @@
 ﻿using CommentsApp.Application.Common.Interfaces;
 using CommentsApp.Application.Common.Models;
 using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CommentsApp.Infrastructure.Services
 {

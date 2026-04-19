@@ -1,9 +1,6 @@
 ﻿using CommentsApp.Application.Common.Interfaces;
 using CommentsApp.Application.DTOs;
 using CommentsApp.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CommentsApp.Application.Services
 {

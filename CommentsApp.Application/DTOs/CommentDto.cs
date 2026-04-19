@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CommentsApp.Application.DTOs
+﻿namespace CommentsApp.Application.DTOs
 {
     public class CommentDto
     {
