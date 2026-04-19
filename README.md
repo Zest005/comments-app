@@ -75,7 +75,7 @@ dotnet ef database update --project CommentsApp.Persistence --startup-project Co
 
 ```bash
 cd CommentsApp.Web
-dotnet run
+dotnet run --launch-profile https
 ```
 
 ### Frontend
@@ -234,7 +234,7 @@ dotnet ef database update --project CommentsApp.Persistence --startup-project Co
 
 ```bash
 cd CommentsApp.Web
-dotnet run
+dotnet run --launch-profile https
 ```
 
 ### Frontend
